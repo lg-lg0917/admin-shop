@@ -11,10 +11,14 @@
 //   background-color:$color
 // }
 /* 不加任何限制时，组件与组件之间的样式是会互相影响的 */
-/*
+
  *{
   margin: 0;
   padding: 0;
 }
-*/
+html,body,#app{
+  width: 100%;
+  height: 100%;
+}
+
 </style>
