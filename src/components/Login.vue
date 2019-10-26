@@ -1,9 +1,9 @@
 <template>
   <div class="login">
-    <el-form ref="Form" :rules="rules" :model="form"  label-width="80px" status-icon>
+    <el-form ref="Form" :rules="rules" :model="form" label-width="80px" status-icon>
       <img class="logo" src="../assets/01.jpg" alt />
       <el-form-item label="用户名" prop="username">
-        <el-input placeholder="请输入用户名" v-model="form.username" ></el-input>
+        <el-input placeholder="请输入用户名" v-model="form.username"></el-input>
       </el-form-item>
       <el-form-item label="密码" prop="password">
         <el-input type="password" placeholder="请输入密码" v-model="form.password"></el-input>
@@ -14,7 +14,7 @@
         // 步骤:
       // 1. 给需要获取的元素, 添加上 ref 属性
       // 2. 只要给元素加上了 ref 属性, 将来通过 this.$refs 就可以获取到该元素的引用
-       -->
+        -->
         <el-button @click="resetForm">重置</el-button>
       </el-form-item>
     </el-form>
@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 export default {
   data () {
     return {
@@ -49,35 +48,33 @@ export default {
     resetForm () {
       this.$refs.Form.resetFields()
     },
-    login () {
-      this.$refs.Form.validate(boolean => {
-        console.log(boolean)
-        if (!boolean) return
-        axios.post('http://localhost:8888/api/private/v1/login', this.form).then(res => {
-          const { meta } = res.data
-          if (meta.status === 200) {
-            console.log(meta.msg)
-            this.$message({
-              type: 'success',
-              message: meta.msg
-              // center: true
-            })
-            this.$router.push('/index')
-          } else {
-            this.$message({
-              type: 'error',
-              message: meta.msg
-              // center: true
-            })
-          }
-        })
-      })
+    async login () {
+      try {
+        // 先校验, 再发送ajax请求
+        await this.$refs.form.validate()
+        const { meta, data } = await this.$axios.post('login', this.form)
+        if (meta.status === 200) {
+          // 一登陆成功, 就存储 token 令牌(字符串)到本地
+          localStorage.setItem('token', data.token)
+
+          this.$message({
+            type: 'success',
+            message: meta.msg,
+            duration: 1000
+          })
+          this.$router.push({ name: 'index' })
+        } else {
+          this.$message.error(meta.msg)
+        }
+      } catch (e) {
+        console.log(e)
+      }
     }
   }
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .login {
   background-color: #2d434c;
   width: 100%;
